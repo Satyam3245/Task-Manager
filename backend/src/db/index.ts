@@ -1,5 +1,4 @@
-import { email } from "zod";
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { User , CreateUserResult } from "../types/tstypes";
 
@@ -20,7 +19,6 @@ export async function createUser(userInfo : User): Promise<CreateUserResult>{
         await prisma.$disconnect();
     }
 }
-
 
 export async function findUser(email :string,password:string){
     try {

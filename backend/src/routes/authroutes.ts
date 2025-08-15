@@ -1,7 +1,7 @@
 import { Router , Request , Response } from "express";
 import { SignInBody, StatusCode, StatusResponse } from "../types/tstypes";
 import bcrypt from 'bcrypt';
-import { createUser, findUser, findUserByEmail } from "../prisma";
+import { createUser, findUser, findUserByEmail } from "../db";
 import jwt from 'jsonwebtoken';
 const saltRound = 10;
 
