@@ -1,8 +1,9 @@
 import { Router , Request , Response } from "express";
-import { SignInBody, StatusCode, StatusResponse } from "../types/tstypes";
+import { LoginBody, SignInBody, StatusCode, StatusResponse } from "../types/tstypes";
 import bcrypt from 'bcrypt';
 import { createUser, findUser, findUserByEmail } from "../db";
 import jwt from 'jsonwebtoken';
+import { createSignin , createLogin } from "../validations/uservalidation";
 const saltRound = 10;
 
 const authRoute = Router();
@@ -11,11 +12,12 @@ const authRoute = Router();
 
 authRoute.post('/signup',async (req:Request,res:Response<StatusResponse>)=>{
     const userBody : SignInBody = req.body 
-    if ( !userBody.name || !userBody.email || !userBody.password){
+    const parseBody = createSignin.safeParse(userBody);
+    if(!parseBody.success){
         return res.status(StatusCode.InputNotGiven).json({
-            msg : 'Input is Not Given !'
+            msg:'Verify Your Input !'
         })
-    }
+    } 
     try {
         const existingUser = await findUserByEmail(userBody.email)
         if(existingUser){
@@ -24,7 +26,8 @@ authRoute.post('/signup',async (req:Request,res:Response<StatusResponse>)=>{
             })
         }
         const hashPassword = await bcrypt.hash(userBody.password,saltRound);
-        const user = await createUser(userBody);
+        const hashedUser: SignInBody = {email : userBody.email,name:userBody.name , password:hashPassword}  
+        const user = await createUser(hashedUser);
         if(user.error){
             return res.status(StatusCode.InputNotGiven).json({ msg: user.error });
         }
@@ -43,14 +46,15 @@ authRoute.post('/signup',async (req:Request,res:Response<StatusResponse>)=>{
 
 
 authRoute.post('/login',async (req:Request,res:Response<StatusResponse>)=>{
-    const {email , password} = req.body();
-    if (!email || !password){
+    const userBody : LoginBody = req.body;
+    const parseBody = createLogin.safeParse(userBody);
+    if(!parseBody.success){
         return res.status(StatusCode.InputNotGiven).json({
-            msg : 'Input is Not Given !'
+            msg:'Verify Your Input !'
         })
-    }
+    } 
     try {
-        const user = await findUser(email,password);
+        const user = await findUser(parseBody.data.email,parseBody.data.password);
         if (user == null){
             return res.json({
                 msg:'Credentials are not Match ! or Something Happened to our Database'
@@ -58,7 +62,7 @@ authRoute.post('/login',async (req:Request,res:Response<StatusResponse>)=>{
         }else {
             const token = jwt.sign(user,process.env.JWT_SECRET as string)
             return res.json({
-                msg:'Successfully Login !'
+                msg:token
             })
         }
     } catch (error) {

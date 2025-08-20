@@ -13,6 +13,10 @@ export interface SignInBody {
     name : string,
     password : string
 }
+export interface LoginBody {
+    email : string,
+    password : string
+}
 export interface User {
     name : string,
     email : string,

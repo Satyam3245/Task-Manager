@@ -25,7 +25,6 @@ export async function findUser(email :string,password:string){
         const user = await prisma.user.findFirst({
             where:{
                 email: email,
-                password : password
             }
         });
         if (user && await bcrypt.compare(password,user.password)){
