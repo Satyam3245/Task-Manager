@@ -70,10 +70,16 @@ export async function getAllTask(id :string){
 }
 
 
-export async function createTodo(id : string , task : string){
+export async function createTask(id : string , task : string){
     try {
-        
+        const todo = await prisma.todos.create({
+            data:{
+                userId : id,
+                task : task
+            }
+        });
+        return todo;
     } catch (error) {
-        
+        throw error
     }
 }

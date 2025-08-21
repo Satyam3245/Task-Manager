@@ -2,7 +2,7 @@ import { Router } from "express";
 import AuthMiddleWare, { DecodeFunction } from "../middleware/middleware";
 import {  Request , Response } from "express";
 import { StatusCode, TodoBody } from "../types/tstypes";
-import { getAllTask } from "../db";
+import { createTask, getAllTask } from "../db";
 import { createTodo } from "../validations/uservalidation";
 
 const todoRoutes = Router();
@@ -36,6 +36,12 @@ todoRoutes.get('/',AuthMiddleWare,async (req:Request,res:Response)=>{
 
 todoRoutes.post('/posttodo',AuthMiddleWare,async (req:Request,res:Response)=>{
     const todoBody : TodoBody = req.body;
+    const body = DecodeFunction(req);
+    if(!body || !body.id || !body.email){
+        return res.status(StatusCode.Unauthorized).json({
+            msg : 'Please send the correct token ..'
+        })
+    }
     const parseBody = createTodo.safeParse(todoBody);
     if(!parseBody.success){
         return res.status(StatusCode.LackInput).json({
@@ -43,9 +49,14 @@ todoRoutes.post('/posttodo',AuthMiddleWare,async (req:Request,res:Response)=>{
         })
     }
     try {
-        const todo = await 
+        const todo = await createTask(body.id,todoBody.task);
+        return res.status(StatusCode.Successful).json({
+            msg : 'Successfully Made !'
+        })
     } catch (error) {
-        
+        return res.status(StatusCode.InternalServer).json({
+            msg : 'Error Occurred !'
+        })
     }
 
 })
