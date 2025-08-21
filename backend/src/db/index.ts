@@ -52,3 +52,28 @@ export async function findUserByEmail(email : string){
         console.log(error)
     }
 }
+
+
+export async function getAllTask(id :string){
+    try {
+        const todo = await prisma.todos.findMany({
+            where:{
+                userId : id
+            }
+        });
+
+        return todo.length > 0 ? todo : null;
+    } catch (error) {
+        console.error("Error fetching tasks:", error);
+        throw error;
+    }
+}
+
+
+export async function createTodo(id : string , task : string){
+    try {
+        
+    } catch (error) {
+        
+    }
+}

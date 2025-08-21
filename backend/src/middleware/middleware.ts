@@ -5,7 +5,14 @@ import jwt from 'jsonwebtoken';
 interface AuthenticateUser extends Request {
     user? : any
 }
-const AuthMiddleWare = (req:AuthenticateUser,res:Response,next:NextFunction): any =>{
+
+interface decodetoken {
+    email?: string,
+    id?: string,
+    iat?: number
+}
+
+const AuthMiddleWare = (req:AuthenticateUser,res:Response,next:NextFunction)=>{
     const authHeader = req.headers['authorization'];
 
     if(!authHeader || typeof authHeader !== "string"){
@@ -24,6 +31,26 @@ const AuthMiddleWare = (req:AuthenticateUser,res:Response,next:NextFunction): an
                 msg : 'Invalid token.' 
             })
         }
+}
+
+export const DecodeFunction = (req : AuthenticateUser )=>{
+    const authHeader = req.headers['authorization'];
+    if(!authHeader){
+        return null;
+    }
+    const token = authHeader.split(" ")[1];
+    if(!authHeader){
+        return null;
+    }
+    try {
+        const decodedToken = jwt.decode(token) as decodetoken
+        if(!decodedToken || !decodedToken.id || decodedToken.email){
+            return null
+        }
+        return decodedToken
+    } catch (error) {
+        return null;
+    }
 }
 
 

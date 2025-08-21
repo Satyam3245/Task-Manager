@@ -1,4 +1,4 @@
-import {email, z} from "zod"
+import {z} from "zod"
 
 export const createSignin = z.object({
     name : z.string(),
@@ -9,4 +9,8 @@ export const createSignin = z.object({
 export const createLogin = z.object({
     email : z.string(),
     password : z.string()
+})
+
+export const createTodo = z.object({
+    task : z.string()
 })

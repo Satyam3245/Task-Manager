@@ -34,3 +34,6 @@ export interface CreateUserResult {
     data? : returnInfo,
     error? : string
 }
+export interface TodoBody {
+    task : string,
+}
